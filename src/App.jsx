@@ -417,6 +417,8 @@ function App() {
 
     if (isStarredActive)
       filteredItems = filteredItems.filter((el, idx) => el.isFavorite);
+    if (isGroupActive)
+      filteredItems = filteredItems.filter((el, idx) => el.isGroup);
 
     setFilteredChatItems(filteredItems);
   }, [chatItems, searchValue, isStarredActive, isGroupActive]);
