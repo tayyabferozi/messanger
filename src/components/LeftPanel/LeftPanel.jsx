@@ -54,57 +54,61 @@ const LeftPanel = ({
       </div>
 
       <div className={classes.chatList}>
-        {chatItems?.map((el, idx) => {
-          let lastMessage;
-          if (el?.messages?.length > 0) {
-            lastMessage = el.messages[el.messages.length - 1].text;
-            lastMessage =
-              lastMessage.slice(0, 24) +
-              " " +
-              (lastMessage.length > 24 ? "..." : "");
-          }
+        {chatItems?.length < 1 ? (
+          <div className={classes.noChats}>No chats to show</div>
+        ) : (
+          chatItems?.map((el, idx) => {
+            let lastMessage;
+            if (el?.messages?.length > 0) {
+              lastMessage = el.messages[el.messages.length - 1].text;
+              lastMessage =
+                lastMessage.slice(0, 24) +
+                " " +
+                (lastMessage.length > 24 ? "..." : "");
+            }
 
-          return (
-            <div
-              key={"chat-item-" + idx}
-              className={clsx(
-                classes.chatItem,
-                selectedChatId === el.id && classes.active
-              )}
-              onClick={() => {
-                setSelectedChatId(el.id);
-                setOpened(false);
-              }}
-            >
-              <div className={classes.chatItemLeft}>
-                <div className={classes.chatAvatar}>
-                  <img
-                    className={clsx(el?.isGroup && classes.groupIcon)}
-                    src={el?.isGroup ? GroupFill : el.img}
-                    alt={el.name}
-                  />
-                </div>
-                <div className={classes.chatText}>
-                  <h6>
-                    {el?.name?.slice(0, 16)}{" "}
-                    {el?.name?.length > 16 ? "..." : ""}
-                  </h6>
-                  <p>{lastMessage}</p>
-                </div>
-              </div>
+            return (
               <div
-                className={classes.favorite}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addOrRemoveFavorite(el?.id);
+                key={"chat-item-" + idx}
+                className={clsx(
+                  classes.chatItem,
+                  selectedChatId === el.id && classes.active
+                )}
+                onClick={() => {
+                  setSelectedChatId(el.id);
+                  setOpened(false);
                 }}
               >
-                <img src={StarEmpty} alt="star" />
-                {el?.isFavorite && <img src={StarFill} alt="star" />}
+                <div className={classes.chatItemLeft}>
+                  <div className={classes.chatAvatar}>
+                    <img
+                      className={clsx(el?.isGroup && classes.groupIcon)}
+                      src={el?.isGroup ? GroupFill : el.img}
+                      alt={el.name}
+                    />
+                  </div>
+                  <div className={classes.chatText}>
+                    <h6>
+                      {el?.name?.slice(0, 16)}{" "}
+                      {el?.name?.length > 16 ? "..." : ""}
+                    </h6>
+                    <p>{lastMessage}</p>
+                  </div>
+                </div>
+                <div
+                  className={classes.favorite}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addOrRemoveFavorite(el?.id);
+                  }}
+                >
+                  <img src={StarEmpty} alt="star" />
+                  {el?.isFavorite && <img src={StarFill} alt="star" />}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

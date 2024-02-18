@@ -120,6 +120,13 @@
   }
 }
 .chatList {
+  .noChats {
+    text-align: center;
+    padding: 20px;
+    font-size: 20px;
+    opacity: 0.5;
+  }
+
   .chatItem {
     display: flex;
     justify-content: space-between;
