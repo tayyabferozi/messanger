@@ -352,7 +352,7 @@ function App() {
   const [searchValue, setSearchValue] = useState("");
   const [isStarredActive, setIsStarredActive] = useState(false);
   const [isGroupActive, setIsGroupActive] = useState(false);
-  const [isLeftPanelOpened, setIsLeftPanelOpened] = useState(false);
+  const [isLeftPanelOpened, setIsLeftPanelOpened] = useState(true);
 
   const addOrRemoveFavorite = (id) => {
     setChatItems((prev) => {
