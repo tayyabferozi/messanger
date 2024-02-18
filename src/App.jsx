@@ -372,6 +372,7 @@ function App() {
         ...msg,
         sender: myUserName,
         img: MyAvatar,
+        reactions: {},
       });
       return newState;
     });
