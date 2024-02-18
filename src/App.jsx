@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import clsx from "clsx";
 import cloneDeep from "clone-deep";
 
 import LeftPanel from "./components/LeftPanel";
@@ -8,7 +9,7 @@ import User from "./assets/user.jpg";
 import User2 from "./assets/user-2.jpg";
 import Chevron from "./assets/chevron.svg";
 import classes from "./index.module.scss";
-import clsx from "clsx";
+import "./App.css";
 
 const chatList = [
   {

@@ -389,7 +389,6 @@
   position: relative;
 
   @media screen and (max-width: 575px) {
-    // flex-wrap: wrap;
     gap: 12px;
   }
 
@@ -545,6 +544,10 @@
       transition: 0.4s ease;
       height: 0;
       overflow: hidden;
+
+      @media screen and (max-width: 575px) {
+        right: -60px;
+      }
 
       &.active {
         height: 450px;
