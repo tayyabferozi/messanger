@@ -11,7 +11,7 @@ import FileIcon from "../../assets/file-solid.svg";
 import MyAvatar from "../../assets/user-3.jpg";
 import Happiness from "../../assets/happiness.png";
 import Reply from "../../assets/reply.png";
-import Download from "../../assets/download.svg";
+import { ReactComponent as Download } from "../../assets/download.svg";
 import classes from "./RightPanel.module.scss";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 
