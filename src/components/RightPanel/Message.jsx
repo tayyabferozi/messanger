@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 
 import LikeEmoji from "../../assets/thumbs-up.png";
@@ -12,9 +12,7 @@ import MyAvatar from "../../assets/user-3.jpg";
 import Happiness from "../../assets/happiness.png";
 import Reply from "../../assets/reply.png";
 import { ReactComponent as Download } from "../../assets/download.svg";
-import classes from "./RightPanel.module.scss";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
-import { useEffect } from "react";
 
 const emojiOptions = [
   {
@@ -114,7 +112,7 @@ const Message = ({
   const isMe = myUserName === el?.sender;
 
   return (
-    <div className={clsx(classes.chatMessage, isMe ? classes.me : classes.him)}>
+    <div className={clsx()}>
       {previewingImg && (
         <div className="z-[60] overflow-auto fixed w-full h-screen left-0 top-0 bg-[rgba(0,0,0,.9)]">
           <div
@@ -252,7 +250,10 @@ const Message = ({
           <div className="flex flex-col gap-1 border-b border-solid border-[rgba(255,255,255,.25)] pb-2 mb-2">
             {previewableImages?.map((el, idx) => {
               return (
-                <div key={"dropped-file-" + idx} className={classes.file}>
+                <div
+                  key={"dropped-file-previewable-" + idx}
+                  // className={classes.file}
+                >
                   <img
                     onClick={() => setPreviewingImg(el)}
                     className="max-w-[500px] mx-auto w-full cursor-pointer"
