@@ -3,6 +3,10 @@
   position: relative;
 }
 
+.newChatMode {
+  padding: 24px;
+}
+
 .dropFiles {
   position: absolute;
   left: 0;
@@ -123,15 +127,10 @@
         margin: 10px 0;
         padding: 16px;
         border-radius: 16px;
-        width: max-content;
-        max-width: 1000px;
+        width: calc(100% - 130px);
+        max-width: max-content;
         color: #fff;
         position: relative;
-
-        @media screen and (max-width: 767px) {
-          width: calc(100% - 130px);
-          max-width: max-content;
-        }
 
         @media screen and (max-width: 575px) {
           width: calc(100% - 130px + 54px);
@@ -263,6 +262,19 @@
           border-right-color: #ffffff2a;
         }
 
+        .previews {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+          padding-bottom: 8px;
+          margin-bottom: 16px;
+
+          img {
+            max-width: 100%;
+          }
+        }
+
         .attachments {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
@@ -271,6 +283,18 @@
           padding-bottom: 8px;
           margin-bottom: 16px;
           transition: 0.4s ease;
+
+          @media screen and (max-width: 1366px) {
+            grid-template-columns: repeat(3, 1fr);
+          }
+
+          @media screen and (max-width: 1199px) {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          @media screen and (max-width: 575px) {
+            grid-template-columns: repeat(1, 1fr);
+          }
 
           .file {
             border: 1px solid rgba(56, 61, 59, 0.325);
@@ -283,6 +307,7 @@
             color: #fff;
             height: 40px;
             position: relative;
+            font-size: 14px;
 
             .download {
               position: absolute;
@@ -411,11 +436,28 @@
 
     .droppedFiles {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 4px;
       overflow: auto;
       max-height: 150px;
       margin: 0 0 16px;
+      font-size: 13px;
+
+      @media screen and (max-width: 1525px) {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      @media screen and (max-width: 1199px) {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      @media screen and (max-width: 575px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media screen and (max-width: 450px) {
+        grid-template-columns: repeat(1, 1fr);
+      }
     }
 
     .replyingToTitle {

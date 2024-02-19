@@ -4,10 +4,10 @@ import cloneDeep from "clone-deep";
 import clsx from "clsx";
 
 import ChatBox from "./ChatBox";
-import { ReactComponent as MessageIcon } from "../../assets/message.svg";
-import GroupFill from "../../assets/group.png";
-import classes from "./RightPanel.module.scss";
 import Message from "./Message";
+import GroupFill from "../../assets/group.png";
+import { ReactComponent as MessageIcon } from "../../assets/message.svg";
+import classes from "./RightPanel.module.scss";
 
 const RightPanel = ({
   myUserName,
@@ -16,6 +16,7 @@ const RightPanel = ({
   addMessage,
   addReaction,
   removeReaction,
+  isNewChatMode,
 }) => {
   const [selectedChat, setSelectedChat] = useState(null);
   const [isDragEntered, setIsDragEntered] = useState(false);
@@ -60,7 +61,9 @@ const RightPanel = ({
         Drop your file/s
       </div>
       <input {...getInputProps()} />
-      {selectedChat ? (
+      {isNewChatMode ? (
+        <div className={classes.newChatMode}></div>
+      ) : selectedChat ? (
         <div className={classes.chatPanel}>
           <div className={classes.header}>
             <div className={clsx(classes.avatar)}>

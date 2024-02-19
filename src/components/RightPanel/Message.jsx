@@ -14,6 +14,7 @@ import Reply from "../../assets/reply.png";
 import { ReactComponent as Download } from "../../assets/download.svg";
 import classes from "./RightPanel.module.scss";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
+import { useEffect } from "react";
 
 const emojiOptions = [
   {
@@ -38,6 +39,18 @@ const emojiOptions = [
   },
 ];
 
+// const blobToImage = (blob) => {
+//   return new Promise((resolve) => {
+//     const url = URL.createObjectURL(blob);
+//     let img = new Image();
+//     img.onload = () => {
+//       URL.revokeObjectURL(url);
+//       resolve(img);
+//     };
+//     img.src = url;
+//   });
+// };
+
 const Message = ({
   el,
   selectedChat,
@@ -49,6 +62,8 @@ const Message = ({
 }) => {
   const reactRef = useRef();
   const [isReactPickerActive, setIsReactPickerActive] = useState(false);
+  const [attachments, setAttachments] = useState([]);
+  const [previewableImages, setPreviewableImages] = useState([]);
 
   let avatar;
   let iAmTheSender = myUserName === el.sender;
@@ -75,6 +90,33 @@ const Message = ({
     if (prevMessageIsMine) hasTopLeftCorner = true;
     if (nextMessageIsMine) hasBottomLeftCorner = true;
   }
+
+  useEffect(() => {
+    const images =
+      el?.attachments?.filter((el) => {
+        return el?.type?.startsWith("image");
+      }) || [];
+
+    const attachments = el?.attachments?.filter((el) => {
+      return !el?.type?.startsWith("image");
+    });
+
+    setAttachments(attachments);
+
+    console.log(images, attachments);
+    const previewableImages = [];
+
+    async function pushPreviewable(image) {
+      const preview = URL.createObjectURL(image);
+      previewableImages.push(preview);
+    }
+
+    for (const image of images) {
+      pushPreviewable(image);
+    }
+    console.log("previewableImages", previewableImages);
+    setPreviewableImages(previewableImages);
+  }, [el]);
 
   let senderName = iAmTheSender ? "Me" : el?.sender;
 
@@ -175,9 +217,25 @@ const Message = ({
           <div className={classes.replyingTo}>{el.inReplyTo}</div>
         )}
 
-        {el?.attachments?.length > 0 && (
+        {previewableImages?.length > 0 && (
+          <div className={classes.previews}>
+            {previewableImages?.map((el, idx) => {
+              return (
+                <div key={"dropped-file-" + idx} className={classes.file}>
+                  <img
+                    // className={clsx(isImg && classes.invert)}
+                    src={el}
+                    alt="file"
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {attachments?.length > 0 && (
           <div className={classes.attachments}>
-            {el?.attachments?.map((el, idx) => {
+            {attachments?.map((el, idx) => {
               let isImg = false;
               if (el?.type?.startsWith("image")) {
                 isImg = true;

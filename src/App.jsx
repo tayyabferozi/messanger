@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import cloneDeep from "clone-deep";
+import ReactSelect from "react-select";
 
 import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel/RightPanel";
@@ -345,6 +346,12 @@ const chatList = [
   },
 ];
 
+const newChatOptions = {
+  "John Doe": { img: User },
+  "Jane Doe": { img: User2 },
+  Foo: { img: User2 },
+};
+
 function App() {
   const [myUserName] = useState("Ferozi");
   const [chatItems, setChatItems] = useState(chatList);
@@ -354,6 +361,8 @@ function App() {
   const [isStarredActive, setIsStarredActive] = useState(false);
   const [isGroupActive, setIsGroupActive] = useState(false);
   const [isLeftPanelOpened, setIsLeftPanelOpened] = useState(true);
+  const [isNewChatMode, setIsNewChatMode] = useState(false);
+  const [newChatSelectedOptions, setNewChatSelectedOptions] = useState([]);
 
   const addOrRemoveFavorite = (id) => {
     setChatItems((prev) => {
@@ -428,6 +437,115 @@ function App() {
   return (
     <div className={classes.messageContainer}>
       <div
+        className={clsx(classes.modalOverlay, isNewChatMode && classes.active)}
+        onClick={() => {
+          setIsNewChatMode(false);
+        }}
+      />
+      <div className={clsx(classes.modal, isNewChatMode && classes.active)}>
+        <div
+          className={classes.close}
+          onClick={() => {
+            setIsNewChatMode(false);
+          }}
+        >
+          &times;
+        </div>
+
+        <h2>Start New Chat</h2>
+
+        <ReactSelect
+          isMulti={true}
+          value={newChatSelectedOptions}
+          onChange={(e) => setNewChatSelectedOptions(e)}
+          options={Object.keys(newChatOptions).map((el) => ({
+            label: el,
+            value: { name: el, img: newChatOptions[el].img },
+          }))}
+          placeholder="Choose recepients"
+          styles={{
+            multiValue: (baseStyles, state) => ({
+              ...baseStyles,
+              background: "#383d3b",
+            }),
+            multiValueLabel: (baseStyles, state) => ({
+              ...baseStyles,
+              color: "#fff",
+            }),
+            option: (baseStyles, state) => ({
+              ...baseStyles,
+              background: "#2c302e",
+              "&:hover": {
+                background: "#383d3b",
+              },
+            }),
+            menuList: (baseStyles, state) => ({
+              ...baseStyles,
+              background: "#383d3b",
+            }),
+
+            control: (baseStyles, state) => ({
+              ...baseStyles,
+              background: "transparent",
+              borderColor: "#383d3b",
+              boxShadow: "transparent",
+              color: "#fff",
+              "&:hover": {
+                borderColor: "#2c302e",
+              },
+            }),
+            input: (baseStyles, state) => ({
+              ...baseStyles,
+              color: "#fff",
+            }),
+          }}
+        />
+
+        <button
+          className={classes.button}
+          onClick={() => {
+            if (newChatSelectedOptions.length > 0) {
+              if (newChatSelectedOptions.length > 1) {
+                setChatItems((prev) => {
+                  const newState = cloneDeep(prev);
+
+                  const recepients = newChatSelectedOptions
+                    .map((el) => el?.value?.name)
+                    .join(", ");
+
+                  newState.unshift({
+                    id: Math.random(),
+                    isGroup: true,
+                    recepients: recepients,
+                    name: recepients,
+                    isFavorite: false,
+                    messages: [],
+                  });
+                  return newState;
+                });
+              } else {
+                setChatItems((prev) => {
+                  const newState = cloneDeep(prev);
+
+                  newState.unshift({
+                    id: Math.random(),
+                    img: newChatSelectedOptions[0]?.value?.img,
+                    name: newChatSelectedOptions[0]?.value?.name,
+                    isGroup: false,
+                    isFavorite: false,
+                    messages: [],
+                  });
+                  return newState;
+                });
+              }
+            }
+            setIsNewChatMode(false);
+          }}
+        >
+          Start Chart
+        </button>
+      </div>
+      <div
         className={clsx(
           classes.leftOpener,
           isLeftPanelOpened && classes.leftOpened
@@ -449,6 +567,7 @@ function App() {
         setIsStarredActive={setIsStarredActive}
         isGroupActive={isGroupActive}
         setIsGroupActive={setIsGroupActive}
+        setIsNewChatMode={setIsNewChatMode}
       />
       <RightPanel
         myUserName={myUserName}
@@ -457,6 +576,10 @@ function App() {
         addMessage={addMessage}
         addReaction={addReaction}
         removeReaction={removeReaction}
+        isNewChatMode={isNewChatMode}
+        newChatOptions={newChatOptions}
+        newChatSelectedOptions={newChatSelectedOptions}
+        setNewChatSelectedOptions={setNewChatSelectedOptions}
       />
     </div>
   );
