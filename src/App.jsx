@@ -9,7 +9,6 @@ import MyAvatar from "./assets/user-3.jpg";
 import User from "./assets/user.jpg";
 import User2 from "./assets/user-2.jpg";
 import Chevron from "./assets/chevron.svg";
-import "./App.css";
 
 const chatList = [
   {
