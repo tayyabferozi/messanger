@@ -39,18 +39,6 @@ const emojiOptions = [
   },
 ];
 
-// const blobToImage = (blob) => {
-//   return new Promise((resolve) => {
-//     const url = URL.createObjectURL(blob);
-//     let img = new Image();
-//     img.onload = () => {
-//       URL.revokeObjectURL(url);
-//       resolve(img);
-//     };
-//     img.src = url;
-//   });
-// };
-
 const Message = ({
   el,
   selectedChat,
@@ -64,6 +52,7 @@ const Message = ({
   const [isReactPickerActive, setIsReactPickerActive] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [previewableImages, setPreviewableImages] = useState([]);
+  const [previewingImg, setPreviewingImg] = useState("");
 
   let avatar;
   let iAmTheSender = myUserName === el.sender;
@@ -103,7 +92,6 @@ const Message = ({
 
     setAttachments(attachments);
 
-    console.log(images, attachments);
     const previewableImages = [];
 
     async function pushPreviewable(image) {
@@ -114,7 +102,6 @@ const Message = ({
     for (const image of images) {
       pushPreviewable(image);
     }
-    console.log("previewableImages", previewableImages);
     setPreviewableImages(previewableImages);
   }, [el]);
 
@@ -124,31 +111,54 @@ const Message = ({
     setIsReactPickerActive(false);
   });
 
+  const isMe = myUserName === el?.sender;
+
   return (
-    <div
-      className={clsx(
-        classes.chatMessage,
-        myUserName === el?.sender ? classes.me : classes.him
-      )}
-    >
-      {shouldShowAvatar && (
-        <div className={classes.chatMessageAvatarContainer}>
-          <div className={classes.chatMessageAvatar}>
-            <img src={avatar} alt={selectedChat?.name} />
+    <div className={clsx(classes.chatMessage, isMe ? classes.me : classes.him)}>
+      {previewingImg && (
+        <div className="z-[60] overflow-auto fixed w-full h-screen left-0 top-0 bg-[rgba(0,0,0,.9)]">
+          <div
+            className="text-6xl font-bold fixed right-9 top-10 cursor-pointer"
+            onClick={() => setPreviewingImg("")}
+          >
+            &times;
           </div>
-          <div className={classes.chatMessageName}>{senderName}</div>
+          <div className="h-[100%-160px] w-full overflow-auto p-10 flex justify-center items-center">
+            <img src={previewingImg} alt="preview" className="w-1/2" />
+          </div>
+        </div>
+      )}
+
+      {shouldShowAvatar && (
+        <div
+          className={clsx(
+            "flex items-center gap-4",
+            isMe && "flex-row-reverse"
+          )}
+        >
+          <div className="w-10 h-10 rounded-full overflow-hidden relative">
+            <img
+              className="w-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 absolute"
+              src={avatar}
+              alt={selectedChat?.name}
+            />
+          </div>
+          <div className="text-white text-base font-semibold">{senderName}</div>
         </div>
       )}
       <div
         className={clsx(
-          classes.chatMessageBox,
-          hasTopLeftCorner && classes.hasTopLeftCorner,
-          hasTopRightCorner && classes.hasTopRightCorner,
-          hasBottomLeftCorner && classes.hasBottomLeftCorner,
-          hasBottomRightCorner && classes.hasBottomRightCorner
+          "my-[10px] p-4 rounded-2xl w-[calc(100%-130px+54px)] sm:w-[calc(100%-130px] max-w-max text-white relative",
+          isMe
+            ? "bg-[#5156be] sm:mr-[54px] ml-auto"
+            : "bg-[#373c39] sm:ml-[54px]",
+          hasTopLeftCorner && "rounded-tl-[4px]",
+          hasTopRightCorner && "rounded-tr-[4px]",
+          hasBottomLeftCorner && "rounded-bl-[4px]",
+          hasBottomRightCorner && "rounded-br-[4px]"
         )}
       >
-        <div className={classes.addedReactions}>
+        <div className="flex gap-4 absolute top-full -translate-y-1/2 z-10">
           {emojiOptions.map((el2, idx2) => {
             const key = el2.id + "-emoji-added-" + idx2;
             let numAdded = el?.reactions[el2?.label] || 0;
@@ -156,7 +166,7 @@ const Message = ({
               return (
                 <div
                   key={key}
-                  className={classes.addedReaction}
+                  className="px-[6px] py-1 border border-solid border-[#5156be] text-[13px] rounded-lg flex items-center gap-[6px] cursor-pointer font-bold"
                   onClick={() => {
                     removeReaction(selectedChat?.id, idx, el2.label);
                     setIsReactPickerActive(false);
@@ -169,17 +179,29 @@ const Message = ({
             return <React.Fragment key={key} />;
           })}
         </div>
-        <div className={classes.reactionBtnWrapper} ref={reactRef}>
+        <div
+          className={clsx(
+            "absolute top-1/2 -translate-y-1/2 z-10",
+            isMe
+              ? "left-[calc(-24px-16px-28px-8px)] -translate-y-1/2"
+              : "right-[calc(-24px-16px-28px-8px)]"
+          )}
+          ref={reactRef}
+        >
           <div
             className={clsx(
-              classes.emojiPickers,
-              isReactPickerActive && classes.active
+              "absolute top-[calc(100%-3px)] border border-solid border-[#ffffff2f] bg-[#313533] px-2 py-1 rounded-lg flex opacity-0 pointer-events-none z-20",
+              isReactPickerActive && "!opacity-100 !pointer-events-auto"
             )}
           >
             {emojiOptions.map((el, idx2) => {
               return (
-                <button key={el.id + "-emoji-" + idx2}>
+                <button
+                  className="py-1 px-2 rounded-lg bg-transparent border-0 flex items-center justify-center cursor-pointer hover:bg-[#363a38]"
+                  key={el.id + "-emoji-" + idx2}
+                >
                   <img
+                    className="w-[18px] max-w-[18px]"
                     src={el.icon}
                     alt={el.label}
                     onClick={() => {
@@ -192,15 +214,22 @@ const Message = ({
             })}
           </div>
           <button
-            className={clsx(classes.reactionBtn)}
+            className={clsx(
+              "rounded-full cursor-pointer border-0 bg-[#2c302e] flex items-center justify-center w-[28px] h-[28px]"
+            )}
             onClick={() => setIsReactPickerActive(true)}
           >
-            <img src={Happiness} alt="happiness" />
+            <img className="w-5 grayscale" src={Happiness} alt="happiness" />
           </button>
         </div>
 
         <button
-          className={classes.replyBtn}
+          className={clsx(
+            "absolute -translate-x-1/2 bg-transparent flex items-center justify-center w-[28x] h-[28px] rounded-full top-1/2 border-0 cursor-pointer",
+            isMe
+              ? "left-[calc(-24px-16px)] [transform:_rotateY(180deg)_translateY(-50%)]"
+              : "right-[calc(-24px-16px)] -translate-y-1/2"
+          )}
           onClick={() =>
             setReplyingTo(
               el.text
@@ -211,19 +240,22 @@ const Message = ({
             )
           }
         >
-          <img className={classes.reply} src={Reply} alt="reply" />
+          <img className="w-5 invert" src={Reply} alt="reply" />
         </button>
         {el.inReplyTo && (
-          <div className={classes.replyingTo}>{el.inReplyTo}</div>
+          <div className="border-l-[#ffffffa6] border-t-[#ffffff2a] border-b-[#ffffff2a] border-r-[#ffffff2a]">
+            {el.inReplyTo}
+          </div>
         )}
 
         {previewableImages?.length > 0 && (
-          <div className={classes.previews}>
+          <div className="flex flex-col gap-1 border-b border-solid border-[rgba(255,255,255,.25)] pb-2 mb-2">
             {previewableImages?.map((el, idx) => {
               return (
                 <div key={"dropped-file-" + idx} className={classes.file}>
                   <img
-                    // className={clsx(isImg && classes.invert)}
+                    onClick={() => setPreviewingImg(el)}
+                    className="max-w-[500px] mx-auto w-full cursor-pointer"
                     src={el}
                     alt="file"
                   />
@@ -234,23 +266,29 @@ const Message = ({
         )}
 
         {attachments?.length > 0 && (
-          <div className={classes.attachments}>
+          <div className="grid gap-1 border-b border-solid border-[rgba(255,255,255,.25)] pb-2 mb-4 transition-all grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {attachments?.map((el, idx) => {
               let isImg = false;
               if (el?.type?.startsWith("image")) {
                 isImg = true;
               }
               return (
-                <div key={"dropped-file-" + idx} className={classes.file}>
+                <div
+                  key={"dropped-file-" + idx}
+                  className="border border-solid border-[rgba(56,61,59,.325)] rounded-lg p-2 pr-8 flex items-center gap-2 text-white h-10 relative text-sm"
+                >
                   <img
-                    className={clsx(isImg && classes.invert)}
+                    className={clsx("w-4", isImg && "invert")}
                     src={isImg ? AttachImage : FileIcon}
                     alt="file"
                   />
                   <p>
                     {el.name.slice(0, 16)} {el.name.length > 16 ? "..." : ""}
                   </p>
-                  <div className={classes.download} onClick={() => {}}>
+                  <div
+                    className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+                    onClick={() => {}}
+                  >
                     <Download />
                   </div>
                 </div>

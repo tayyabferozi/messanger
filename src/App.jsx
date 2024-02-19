@@ -9,7 +9,6 @@ import MyAvatar from "./assets/user-3.jpg";
 import User from "./assets/user.jpg";
 import User2 from "./assets/user-2.jpg";
 import Chevron from "./assets/chevron.svg";
-import classes from "./index.module.scss";
 import "./App.css";
 
 const chatList = [
@@ -363,6 +362,8 @@ function App() {
   const [isLeftPanelOpened, setIsLeftPanelOpened] = useState(true);
   const [isNewChatMode, setIsNewChatMode] = useState(false);
   const [newChatSelectedOptions, setNewChatSelectedOptions] = useState([]);
+  const [groupImg, setGroupImg] = useState({});
+  const [groupName, setGroupName] = useState("");
 
   const addOrRemoveFavorite = (id) => {
     setChatItems((prev) => {
@@ -435,16 +436,28 @@ function App() {
   }, [chatItems, searchValue, isStarredActive, isGroupActive]);
 
   return (
-    <div className={classes.messageContainer}>
+    <div className="h-screen bg-[#313533] text-[#ced4da] flex">
       <div
-        className={clsx(classes.modalOverlay, isNewChatMode && classes.active)}
+        className={clsx(
+          "bg-[rgba(49,53,51,.75)] backdrop:blur-sm fixed left-0 top-0 right-0 bottom-0 z-[60] transition-all",
+          isNewChatMode
+            ? "pointer-events-none opacity-100"
+            : "opacity-0 pointer-events-none"
+        )}
         onClick={() => {
           setIsNewChatMode(false);
         }}
       />
-      <div className={clsx(classes.modal, isNewChatMode && classes.active)}>
+      <div
+        className={clsx(
+          "fixed w-[calc(100%-80px)] max-w-[500px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-h-[calc(100vh-80px)] bg-[#292d2c] z-[60] rounded-2xl transition-all pt-10 px-6 pb-9",
+          isNewChatMode
+            ? "pointer-events-auto opacity-100"
+            : "opacity-0 pointer-events-none"
+        )}
+      >
         <div
-          className={classes.close}
+          className="absolute right-5 top-5 text-[40px] leading-none cursor-pointer"
           onClick={() => {
             setIsNewChatMode(false);
           }}
@@ -452,7 +465,9 @@ function App() {
           &times;
         </div>
 
-        <h2>Start New Chat</h2>
+        <h2 className="text-center text-white mb-6 text-2xl font-bold">
+          Start New Chat
+        </h2>
 
         <ReactSelect
           isMulti={true}
@@ -501,13 +516,40 @@ function App() {
           }}
         />
 
+        {newChatSelectedOptions.length > 1 && (
+          <div>
+            <input
+              className="w-full h-10 px-3 bg-transparent border border-solid border-[#383d3b] rounded-[4px] mt-5 text-sm outline-none"
+              placeholder="Group Name..."
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+            />
+            <input
+              id="group-img"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                setGroupImg(e.target.files[0]);
+              }}
+            />
+            <label
+              htmlFor="group-img"
+              className="w-full flex items-center justify-center h-20 px-3 bg-transparent border-[2px] border-dashed border-[#383d3b] rounded-[4px] mt-5 text-sm outline-none"
+            >
+              {groupImg?.name || "Choose Group Image"}
+            </label>
+          </div>
+        )}
+
         <button
-          className={classes.button}
+          className="bg-[#5156be] h-[50px] mt-10 block mx-auto py-0 px-6 text-white font-bold rounded-[10px] border-0 text-base cursor-pointer transition-all hover:-translate-y-1"
           onClick={() => {
             if (newChatSelectedOptions.length > 0) {
               if (newChatSelectedOptions.length > 1) {
                 setChatItems((prev) => {
                   const newState = cloneDeep(prev);
+                  let img = URL.createObjectURL(groupImg);
 
                   const recepients = newChatSelectedOptions
                     .map((el) => el?.value?.name)
@@ -516,8 +558,9 @@ function App() {
                   newState.unshift({
                     id: Math.random(),
                     isGroup: true,
+                    img,
                     recepients: recepients,
-                    name: recepients,
+                    name: groupName || recepients,
                     isFavorite: false,
                     messages: [],
                   });
@@ -538,6 +581,10 @@ function App() {
                   return newState;
                 });
               }
+
+              setGroupImg({});
+              setGroupName("");
+              setNewChatSelectedOptions([]);
             }
             setIsNewChatMode(false);
           }}
@@ -547,15 +594,26 @@ function App() {
       </div>
       <div
         className={clsx(
-          classes.leftOpener,
-          isLeftPanelOpened && classes.leftOpened
+          "xl:!hidden fixed left-0 z-50 bg-[#383d3b] border border-solid border-[#5156be] bl-0 block p-[6px] pl-[10px] rounded-tr-[4px] rounded-br-[4px] transition-all xs:top-[140px] top-20",
+          isLeftPanelOpened &&
+            "!left-[350px] xs:!border-l xs:!border-r-0 xs:!rounded-tl-[4px] xs:!rounded-bl-[4px] xs:!rounded-tr-none xs:!rounded-br-none xs:!left-[unset] xs:!right-0"
         )}
         onClick={() => setIsLeftPanelOpened(!isLeftPanelOpened)}
       >
-        <img src={Chevron} alt="chevron" />
+        <img
+          className={clsx(
+            "transition-all block invert w-5",
+            isLeftPanelOpened
+              ? "[transform:_rotateY(0deg)]"
+              : "[transform:_rotateY(180deg)]"
+          )}
+          src={Chevron}
+          alt="chevron"
+        />
       </div>
       <LeftPanel
         opened={isLeftPanelOpened}
+        myUserName={myUserName}
         setOpened={setIsLeftPanelOpened}
         chatItems={filteredChatItems}
         selectedChatId={selectedChatId}
