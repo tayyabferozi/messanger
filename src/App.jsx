@@ -100,6 +100,10 @@ const chatList = [
   {
     id: "random-chat-id-002",
     name: "Group Name here",
+    recepients: [
+      { label: "Talan Septimus", value: { name: "Talan Septimus" } },
+      { label: "Aubrey Webb", value: { name: "Aubrey Webb" } },
+    ],
     isGroup: true,
     isFavorite: false,
     messages: [
@@ -348,6 +352,8 @@ const newChatOptions = {
   "John Doe": { img: User },
   "Jane Doe": { img: User2 },
   Foo: { img: User2 },
+  "Talan Septimus": { img: User },
+  "Aubrey Webb": { img: User },
 };
 
 function App() {
@@ -359,7 +365,8 @@ function App() {
   const [isStarredActive, setIsStarredActive] = useState(false);
   const [isGroupActive, setIsGroupActive] = useState(false);
   const [isLeftPanelOpened, setIsLeftPanelOpened] = useState(true);
-  const [isNewChatMode, setIsNewChatMode] = useState(false);
+  const [editChatId, setEditChatId] = useState(false);
+  const [isNewOrEditChatMode, setIsNewOrEditChatMode] = useState(false);
   const [newChatSelectedOptions, setNewChatSelectedOptions] = useState([]);
   const [groupImg, setGroupImg] = useState({});
   const [groupName, setGroupName] = useState("");
@@ -439,18 +446,18 @@ function App() {
       <div
         className={clsx(
           "bg-[rgba(49,53,51,.75)] backdrop:blur-sm fixed left-0 top-0 right-0 bottom-0 z-[60] transition-all",
-          isNewChatMode
+          isNewOrEditChatMode
             ? "pointer-events-none opacity-100"
             : "opacity-0 pointer-events-none"
         )}
         onClick={() => {
-          setIsNewChatMode(false);
+          setIsNewOrEditChatMode(false);
         }}
       />
       <div
         className={clsx(
           "fixed w-[calc(100%-80px)] max-w-[500px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-h-[calc(100vh-80px)] bg-[#292d2c] z-[60] rounded-2xl transition-all pt-10 px-6 pb-9",
-          isNewChatMode
+          isNewOrEditChatMode
             ? "pointer-events-auto opacity-100"
             : "opacity-0 pointer-events-none"
         )}
@@ -458,14 +465,14 @@ function App() {
         <div
           className="absolute right-5 top-5 text-[40px] leading-none cursor-pointer"
           onClick={() => {
-            setIsNewChatMode(false);
+            setIsNewOrEditChatMode(false);
           }}
         >
           &times;
         </div>
 
         <h2 className="text-center text-white mb-6 text-2xl font-bold">
-          Start New Chat
+          {editChatId ? "Edit" : "Start New"} Chat
         </h2>
 
         <ReactSelect
@@ -545,50 +552,82 @@ function App() {
           className="bg-[#5156be] h-[50px] mt-10 block mx-auto py-0 px-6 text-white font-bold rounded-[10px] border-0 text-base cursor-pointer transition-all hover:-translate-y-1"
           onClick={() => {
             if (newChatSelectedOptions.length > 0) {
-              if (newChatSelectedOptions.length > 1) {
+              if (editChatId) {
                 setChatItems((prev) => {
                   const newState = cloneDeep(prev);
-                  let img = URL.createObjectURL(groupImg);
+                  let img;
+
+                  if (groupImg?.lastModified)
+                    img = URL.createObjectURL(groupImg);
 
                   const recepients = newChatSelectedOptions
                     .map((el) => el?.value?.name)
                     .join(", ");
 
-                  newState.unshift({
-                    id: Math.random(),
-                    isGroup: true,
-                    img,
-                    recepients: recepients,
-                    name: groupName || recepients,
-                    isFavorite: false,
-                    messages: [],
-                  });
+                  const idx = newState.findIndex((el) => el.id === editChatId);
+
+                  if (idx > -1) {
+                    newState[idx] = {
+                      ...newState[idx],
+                      recepients: newChatSelectedOptions,
+                      name: groupName || recepients,
+                    };
+
+                    if (img) newState[idx].img = img;
+                  }
+
                   return newState;
                 });
               } else {
-                setChatItems((prev) => {
-                  const newState = cloneDeep(prev);
+                if (newChatSelectedOptions.length > 1) {
+                  setChatItems((prev) => {
+                    const newState = cloneDeep(prev);
+                    let img;
 
-                  newState.unshift({
-                    id: Math.random(),
-                    img: newChatSelectedOptions[0]?.value?.img,
-                    name: newChatSelectedOptions[0]?.value?.name,
-                    isGroup: false,
-                    isFavorite: false,
-                    messages: [],
+                    if (groupImg?.lastModified)
+                      img = URL.createObjectURL(groupImg);
+
+                    const recepients = newChatSelectedOptions
+                      .map((el) => el?.value?.name)
+                      .join(", ");
+
+                    newState.unshift({
+                      id: Math.random(),
+                      isGroup: true,
+                      img,
+                      recepients: newChatSelectedOptions,
+                      name: groupName || recepients,
+                      isFavorite: false,
+                      messages: [],
+                    });
+                    return newState;
                   });
-                  return newState;
-                });
+                } else {
+                  setChatItems((prev) => {
+                    const newState = cloneDeep(prev);
+
+                    newState.unshift({
+                      id: Math.random(),
+                      img: newChatSelectedOptions[0]?.value?.img,
+                      name: newChatSelectedOptions[0]?.value?.name,
+                      isGroup: false,
+                      isFavorite: false,
+                      messages: [],
+                    });
+                    return newState;
+                  });
+                }
               }
 
+              setEditChatId("");
               setGroupImg({});
               setGroupName("");
               setNewChatSelectedOptions([]);
             }
-            setIsNewChatMode(false);
+            setIsNewOrEditChatMode(false);
           }}
         >
-          Start Chart
+          {editChatId ? "Update" : "Start"} Chart
         </button>
       </div>
       <div
@@ -624,7 +663,7 @@ function App() {
         setIsStarredActive={setIsStarredActive}
         isGroupActive={isGroupActive}
         setIsGroupActive={setIsGroupActive}
-        setIsNewChatMode={setIsNewChatMode}
+        setIsNewOrEditChatMode={setIsNewOrEditChatMode}
       />
       <RightPanel
         myUserName={myUserName}
@@ -633,10 +672,13 @@ function App() {
         addMessage={addMessage}
         addReaction={addReaction}
         removeReaction={removeReaction}
-        isNewChatMode={isNewChatMode}
+        setIsNewOrEditChatMode={setIsNewOrEditChatMode}
+        setEditChatId={setEditChatId}
         newChatOptions={newChatOptions}
         newChatSelectedOptions={newChatSelectedOptions}
         setNewChatSelectedOptions={setNewChatSelectedOptions}
+        setGroupImg={setGroupImg}
+        setGroupName={setGroupName}
       />
     </div>
   );

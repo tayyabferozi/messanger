@@ -7,6 +7,7 @@ import ChatBox from "./ChatBox";
 import Message from "./Message";
 import GroupFill from "../../assets/group.png";
 import { ReactComponent as MessageIcon } from "../../assets/message.svg";
+import { ReactComponent as PencilIcon } from "../../assets/pencil.svg";
 
 const RightPanel = ({
   myUserName,
@@ -15,6 +16,11 @@ const RightPanel = ({
   addMessage,
   addReaction,
   removeReaction,
+  setIsNewOrEditChatMode,
+  setEditChatId,
+  setNewChatSelectedOptions,
+  setGroupImg,
+  setGroupName,
 }) => {
   const [selectedChat, setSelectedChat] = useState(null);
   const [isDragEntered, setIsDragEntered] = useState(false);
@@ -84,6 +90,17 @@ const RightPanel = ({
               />
             </div>
             <div className="text-xl font-medium">{selectedChat?.name}</div>
+            {selectedChat?.isGroup && (
+              <PencilIcon
+                className="w-6 h-6 cursor-pointer"
+                onClick={() => {
+                  setIsNewOrEditChatMode(true);
+                  setEditChatId(selectedChat?.id);
+                  setNewChatSelectedOptions(selectedChat?.recepients);
+                  setGroupName(selectedChat?.name);
+                }}
+              />
+            )}
           </div>
           <div className="overflow-x-hidden overflow-y-auto p-4 flex-grow">
             {selectedChat.messages.map((el, idx) => {

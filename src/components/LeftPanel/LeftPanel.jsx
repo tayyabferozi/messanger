@@ -19,7 +19,7 @@ const LeftPanel = ({
   setIsStarredActive,
   isGroupActive,
   setIsGroupActive,
-  setIsNewChatMode,
+  setIsNewOrEditChatMode,
 }) => {
   return (
     <>
@@ -37,7 +37,7 @@ const LeftPanel = ({
             <h3 className="font-bold">My Name</h3>
           </div>
           <button
-            onClick={() => setIsNewChatMode(true)}
+            onClick={() => setIsNewOrEditChatMode(true)}
             className="w-10 h-10 rounded-full text-[30px] flex justify-center items-center leading-normal border-0 bg-[#383d3b] text-white cursor-pointer transition-all hover:bg-[#363a38]"
           >
             +
@@ -113,7 +113,7 @@ const LeftPanel = ({
                   onClick={() => {
                     setSelectedChatId(el.id);
                     setOpened(false);
-                    setIsNewChatMode(false);
+                    setIsNewOrEditChatMode(false);
                   }}
                 >
                   <div className="flex items-center gap-4">
