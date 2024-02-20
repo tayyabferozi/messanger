@@ -142,21 +142,21 @@ const ChatBox = ({
           });
         }}
       />
-      <label className="flex items-center" htmlFor="imgInput">
+      <label className="flex-shrink-0 flex items-center" htmlFor="imgInput">
         <img
           className="cursor-pointer invert transition-all h-5 sm:h-[30px] hover:scale-105"
           src={AttachImage}
           alt="Attach"
         />
       </label>
-      <label className="flex items-center" htmlFor="fileInput">
+      <label className="flex-shrink-0 flex items-center" htmlFor="fileInput">
         <img
           className="cursor-pointer invert transition-all h-5 sm:h-[30px] hover:scale-105"
           src={AttachFile}
           alt="Attach File"
         />
       </label>
-      <div className="relative flex items-center z-10">
+      <div className="relative flex-shrink-0 flex items-center z-10">
         <img
           onClick={() => setIsPickerActive(!isPickerActive)}
           className="w-5 sm:w-[30px] cursor-pointer transition-all hover:scale-105"

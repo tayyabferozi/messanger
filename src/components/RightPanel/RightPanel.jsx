@@ -111,7 +111,7 @@ const RightPanel = ({
           />
         </div>
       ) : (
-        <div className="flex justify-between flex-col items-center min-h-full gap-[30px] text-3xl font-bold opacity-20 select-none text-center p-[50px]">
+        <div className="flex justify-center flex-col items-center min-h-full gap-[30px] text-3xl font-bold opacity-20 select-none text-center p-[50px]">
           <MessageIcon className="w-1/4" />
           <div>Selected Chat Will Appear Here</div>
         </div>

@@ -25,8 +25,8 @@ const LeftPanel = ({
     <>
       <div
         className={clsx(
-          "border-r border-solid border-[#383d3b] w-[350px] flex-grow-0 flex-shrink-0 pb-6 bg-[#2c302e] overflow-auto transition-all fixed xl:static top-0 z-40 h-screen xl:h-auto xs:!-left-full xs:!w-full",
-          opened ? "left-0" : "-left-[350px]"
+          "border-r border-solid border-[#383d3b] w-[350px] flex-grow-0 flex-shrink-0 pb-6 bg-[#2c302e] overflow-auto transition-all fixed xl:static top-0 z-40 h-screen xl:h-auto xs:-left-full xs:w-full",
+          opened ? "!left-0" : "-left-[350px]"
         )}
       >
         <div className="flex justify-between items-center pt-6 px-6">

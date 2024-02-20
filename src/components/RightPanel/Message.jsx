@@ -47,7 +47,9 @@ const Message = ({
   removeReaction,
 }) => {
   const reactRef = useRef();
+  const reactRefSm = useRef();
   const [isReactPickerActive, setIsReactPickerActive] = useState(false);
+  const [isReactPickerSmActive, setIsReactPickerSmActive] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [previewableImages, setPreviewableImages] = useState([]);
   const [previewingImg, setPreviewingImg] = useState("");
@@ -109,6 +111,10 @@ const Message = ({
     setIsReactPickerActive(false);
   });
 
+  useOnClickOutside(reactRefSm, () => {
+    setIsReactPickerSmActive(false);
+  });
+
   const isMe = myUserName === el?.sender;
 
   return (
@@ -146,7 +152,7 @@ const Message = ({
       )}
       <div
         className={clsx(
-          "my-[10px] p-4 rounded-2xl w-[calc(100%-130px+54px)] sm:w-[calc(100%-130px] max-w-max text-white relative",
+          "my-[10px] p-4 rounded-2xl min-w-[260px] w-[calc(100%-130px+54px)] sm:w-[calc(100%-130px)] max-w-max text-white relative",
           isMe
             ? "bg-[#5156be] sm:mr-[54px] ml-auto"
             : "bg-[#373c39] sm:ml-[54px]",
@@ -156,7 +162,7 @@ const Message = ({
           hasBottomRightCorner && "rounded-br-[4px]"
         )}
       >
-        <div className="flex gap-4 absolute top-full -translate-y-1/2 z-10">
+        <div className="flex gap-1 absolute top-full -translate-y-1/2 z-10">
           {emojiOptions.map((el2, idx2) => {
             const key = el2.id + "-emoji-added-" + idx2;
             let numAdded = el?.reactions[el2?.label] || 0;
@@ -164,7 +170,7 @@ const Message = ({
               return (
                 <div
                   key={key}
-                  className="px-[6px] py-1 border border-solid border-[#5156be] text-[13px] rounded-lg flex items-center gap-[6px] cursor-pointer font-bold"
+                  className="px-[6px] bg-[#2c302e] py-1 border border-solid border-[#5156be] text-[13px] rounded-lg flex items-center gap-[6px] cursor-pointer font-bold"
                   onClick={() => {
                     removeReaction(selectedChat?.id, idx, el2.label);
                     setIsReactPickerActive(false);
@@ -178,6 +184,33 @@ const Message = ({
           })}
         </div>
         <div
+          ref={reactRef}
+          className={clsx(
+            "lg:hidden absolute top-[calc(100%-3px)] border border-solid border-[#ffffff2f] bg-[#313533] px-2 py-1 rounded-lg flex opacity-0 pointer-events-none z-20",
+            isReactPickerSmActive && "!opacity-100 !pointer-events-auto",
+            isMe ? "right-0" : "left-0"
+          )}
+        >
+          {emojiOptions.map((el, idx2) => {
+            return (
+              <button
+                className="py-1 px-2 rounded-lg bg-transparent border-0 flex items-center justify-center cursor-pointer hover:bg-[#363a38]"
+                key={el.id + "-emoji-" + idx2}
+              >
+                <img
+                  className="w-[18px] max-w-[18px]"
+                  src={el.icon}
+                  alt={el.label}
+                  onClick={() => {
+                    addReaction(selectedChat?.id, idx, el.label);
+                    setIsReactPickerSmActive(false);
+                  }}
+                />
+              </button>
+            );
+          })}
+        </div>
+        <div
           className={clsx(
             "absolute top-1/2 -translate-y-1/2 z-10",
             isMe
@@ -188,7 +221,7 @@ const Message = ({
         >
           <div
             className={clsx(
-              "absolute top-[calc(100%-3px)] border border-solid border-[#ffffff2f] bg-[#313533] px-2 py-1 rounded-lg flex opacity-0 pointer-events-none z-20",
+              "hidden lg:flex absolute top-[calc(100%-3px)] border border-solid border-[#ffffff2f] bg-[#313533] px-2 py-1 rounded-lg opacity-0 pointer-events-none z-20",
               isReactPickerActive && "!opacity-100 !pointer-events-auto"
             )}
           >
@@ -205,6 +238,7 @@ const Message = ({
                     onClick={() => {
                       addReaction(selectedChat?.id, idx, el.label);
                       setIsReactPickerActive(false);
+                      setIsReactPickerSmActive(false);
                     }}
                   />
                 </button>
@@ -215,7 +249,10 @@ const Message = ({
             className={clsx(
               "rounded-full cursor-pointer border-0 bg-[#2c302e] flex items-center justify-center w-[28px] h-[28px]"
             )}
-            onClick={() => setIsReactPickerActive(true)}
+            onClick={() => {
+              setIsReactPickerActive(true);
+              setIsReactPickerSmActive(true);
+            }}
           >
             <img className="w-5 grayscale" src={Happiness} alt="happiness" />
           </button>
